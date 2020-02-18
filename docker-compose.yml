@@ -150,8 +150,8 @@ services:
     ports:
       - "3000:8000"
     devices:
-      - "/dev/ttyUSB1"
-      - "/dev/ttyUSB0"
+      - "/dev/tty.SLAB_USBtoUART:/dev/tty"
+      # - "/dev/ttyUSB0"
     privileged: true
 
 volumes:
