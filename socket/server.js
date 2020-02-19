@@ -130,7 +130,7 @@ function processIOFrame(frame) {
 		table.state = TableState.TAKEN;
 		console.log('Table updated:', table);
 		// Then send the onTableUpdatedFrame
-		sendATFrame({ cmd: 'D1', value: [ 0x05 ] });
+		sendATFrame({ cmd: 'D1', value: [ 0x00 ] });
 	}
 }
 
@@ -138,7 +138,9 @@ function sendATFrame(command) {
 	const frame_obj = {
 		// AT Request to be sent
 		type: C.FRAME_TYPE.REMOTE_AT_COMMAND_REQUEST,
-		destination64: '0013A20041582FB1',
+		//destination64: '0013a20041582fb1',
+		destination16: '3de2',
+		//destination64: 'FFFFFFFFFFFFFFFF',
 		command: command.cmd,
 		commandParameter: command.value
 	};
