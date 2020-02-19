@@ -1,12 +1,5 @@
 const Entity = require('./Entity');
 
-const states = {
-	NOT_TAKEN: 'not_taken',
-	TAKEN: 'taken',
-	PROCESSING: 'process',
-	PROCESSED: 'processed'
-};
-
 /**
  * @class The entity who is representing a table in the database
  * @exports
@@ -23,7 +16,6 @@ class Table extends Entity {
      */
 	constructor(id, name, state, mac_address) {
 		super(id);
-		// this.id = id;
 		this.name = name;
 		this.state = state;
 		this.mac_address = mac_address;
