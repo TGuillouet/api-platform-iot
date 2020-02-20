@@ -1,5 +1,5 @@
 const request = require('./../helpers/request');
-const Table = require('./../entities');
+const Table = require('./../entities/Table');
 
 /**
  * Get all tables
