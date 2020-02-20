@@ -1,15 +1,19 @@
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0
-
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
 
 const io = require('socket.io')();
-var SerialPort = require('serialport');
-var xbee_api = require('xbee-api');
+const SerialPort = require('serialport');
+const xbee_api = require('xbee-api');
+
+const request = require('./helpers/request');
 const Frame = require('./helpers/Frame');
 const TableState = require('./enums/TableState');
+
+// Models
 const TableModel = require('./api/Table');
-var C = xbee_api.constants;
+const ChairModel = require('./api/Chair');
 
 // Constants
+const C = xbee_api.constants;
 const SERIAL_PORT_NAME = '/dev/tty.SLAB_USBtoUART';
 const BAUD_RATE = 9600;
 
@@ -32,11 +36,28 @@ let serialport = new SerialPort(
 serialport.pipe(xbeeAPI.parser);
 xbeeAPI.builder.pipe(serialport);
 
+let getStatus;
+let previousTables = [];
+let currentTables = [];
 serialport.on('open', function() {
-	TableModel.getTables().then((val) => {
-		console.log(val);
-		sendATFrame('3de2', { cmd: 'D1', value: [ 0x05 ] });
-	});
+	getStatus = setInterval(async () => {
+		const res = await request('/r_tables', 'GET');
+		previousTables = currentTables;
+		currentTables = res.rows;
+
+		previousTables.forEach((pTable) => {
+			let current = currentTables.find((cTable) => cTable.id === pTable.id);
+			if (current.state !== pTable.state) {
+				if (current.state === TableState.PROCESSING) {
+					console.log('Processing a table', current.macAddress);
+					sendATFrame(current.macAddress, { cmd: 'D1', value: [ 0x05 ] });
+				} else if (current.state === TableState.PROCESSED) {
+					console.log('Table processed', current.macAddress);
+					sendATFrame(current.macAddress, { cmd: 'D1', value: [ 0x04 ] });
+				}
+			}
+		});
+	}, 5000);
 });
 
 // All frames parsed by the XBee will be emitted here
@@ -62,10 +83,10 @@ xbeeAPI.parser.on('data', function(frame) {
 		// let dataReceived = String.fromCharCode.apply(null, frame.nodeIdentifier);
 		// console.log(">> ZIGBEE_RECEIVE_PACKET >", frame);
 	} else if (C.FRAME_TYPE.ZIGBEE_IO_DATA_SAMPLE_RX === frame.type) {
-		console.log(frame);
+		// console.log(frame);
 		processIOFrame(frame);
 	} else if (C.FRAME_TYPE.REMOTE_COMMAND_RESPONSE === frame.type) {
-		console.log('RemoteResponse', frame);
+		// console.log('RemoteResponse', frame);
 		processRemoteResponse(frame);
 	} else {
 		console.debug('Frame: ', frame);
@@ -98,33 +119,23 @@ const port = 8000;
 io.listen(port);
 console.log('listening on port ', port);
 
-function processIOFrame(frame) {
+async function processIOFrame(frame) {
 	const currentFrame = new Frame(frame);
 	// FIXME: Analog value
 	if (currentFrame.digital_values.DIO0 === 1) {
-		// Get all tables
-		const tables = [
-			{
-				id: 1,
-				state: TableState.NOT_TAKEN,
-				name: 'Madrid',
-				mac_address: '3de2',
-				chairs: [ { id: 1, mac_address: '3de2' } ]
-			}
-		];
-		// Get the table who have the chair who is sending the frame
-		let table = tables.find(
-			(cTable) => cTable.chairs.findIndex((chair) => chair.mac_address === currentFrame.mac_address) !== -1
-		);
+		try {
+			// Get all tables
+			const chairResponse = await ChairModel.getChairs();
 
-		// If a table is found
-		if (table) {
-			// Update the table with it's new state
-			console.log('Table:', table);
-			table.state = TableState.TAKEN;
-			console.log('Table updated:', table);
-			// Then send the onTableUpdatedFrame
-			sendATFrame('3de2', { cmd: 'D1', value: [ 0x04 ] });
+			const chair = chairResponse.rows.find((cChair) => cChair.mac_address === currentFrame.mac_address);
+
+			// If a chair is found
+			if (chair) {
+				// Update the table with it's new state
+				await TableModel.updateTable(chair.table.id, { state: TableState.TAKEN });
+			}
+		} catch (error) {
+			console.error(error);
 		}
 	}
 }
