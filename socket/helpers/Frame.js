@@ -2,7 +2,7 @@ class Frame {
 	constructor(frame) {
 		console.log(
 			'Reveiving a new frame with',
-			`MAC: ${frame.remote64}`,
+			`MAC: ${frame.remote16}`,
 			`DIGITAL: ${JSON.stringify(frame.digitalSamples)}`,
 			`ANALOG: ${JSON.stringify(frame.analogSamples)}`
 		);
