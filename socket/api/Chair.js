@@ -1,11 +1,15 @@
 const request = require('./../helpers/request');
+const Chair = require('./../entities/Chair');
 
 /**
  * Get all chairs
  * @return {Promise<[Chair]>} The list of all chairs for a table
  */
 async function getChairs() {
-	return await request('/chairs', 'GET');
+	return await request('/chairs', 'GET').then((value) => ({
+		...value,
+		rows: value.rows.map((v) => new Chair(v.id, v.rtable, v.macAddress))
+	}));
 }
 
 /**
