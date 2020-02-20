@@ -30,24 +30,7 @@ serialport.pipe(xbeeAPI.parser);
 xbeeAPI.builder.pipe(serialport);
 
 serialport.on('open', function() {
-	// var frame_obj = {
-	// 	// AT Request to be sent
-	// 	type: C.FRAME_TYPE.AT_COMMAND,
-	// 	command: 'NI',
-	// 	commandParameter: []
-	// };
-
-	// xbeeAPI.builder.write(frame_obj);
-
-	// frame_obj = {
-	// 	// AT Request to be sent
-	// 	type: C.FRAME_TYPE.REMOTE_AT_COMMAND_REQUEST,
-	// 	destination64: 'FFFFFFFFFFFFFFFF',
-	// 	command: 'NI',
-	// 	commandParameter: []
-	// };
-	// xbeeAPI.builder.write(frame_obj);
-	sendATFrame({ cmd: 'D1', value: [ 0x05 ] });
+	sendATFrame('3de2', { cmd: 'D1', value: [ 0x05 ] });
 });
 
 // All frames parsed by the XBee will be emitted here
@@ -76,7 +59,7 @@ xbeeAPI.parser.on('data', function(frame) {
 		console.log(frame);
 		processIOFrame(frame);
 	} else if (C.FRAME_TYPE.REMOTE_COMMAND_RESPONSE === frame.type) {
-		console.log(frame);
+		console.log('RemoteResponse', frame);
 		processRemoteResponse(frame);
 	} else {
 		console.debug('Frame: ', frame);
@@ -116,41 +99,46 @@ function processIOFrame(frame) {
 		// Get all tables
 		const tables = [
 			{
-				id: '0013a20041582fb1',
+				id: 1,
 				state: TableState.NOT_TAKEN,
-				chairs: [ { id: '0013a20041582fb1' } ]
+				name: 'Madrid',
+				mac_address: '3de2',
+				chairs: [ { id: 1, mac_address: '3de2' } ]
 			}
 		];
 		// Get the table who have the chair who is sending the frame
 		let table = tables.find(
-			(cTable) => cTable.chairs.findIndex((chair) => chair.id === currentFrame.mac_address) !== -1
+			(cTable) => cTable.chairs.findIndex((chair) => chair.mac_address === currentFrame.mac_address) !== -1
 		);
-		// Update the table with it's new state
-		console.log('Table:', table);
-		table.state = TableState.TAKEN;
-		console.log('Table updated:', table);
-		// Then send the onTableUpdatedFrame
-		sendATFrame({ cmd: 'D1', value: [ 0x00 ] });
+
+		// If a table is found
+		if (table) {
+			// Update the table with it's new state
+			console.log('Table:', table);
+			table.state = TableState.TAKEN;
+			console.log('Table updated:', table);
+			// Then send the onTableUpdatedFrame
+			sendATFrame('3de2', { cmd: 'D1', value: [ 0x04 ] });
+		}
 	}
 }
 
-function sendATFrame(command) {
+function processRemoteResponse(frame) {
+	const currentFrame = new Frame(frame);
+	console.log(currentFrame);
+}
+
+function sendATFrame(destination, command) {
 	const frame_obj = {
 		// AT Request to be sent
 		type: C.FRAME_TYPE.REMOTE_AT_COMMAND_REQUEST,
-		//destination64: '0013a20041582fb1',
-		destination16: '3de2',
-		//destination64: 'FFFFFFFFFFFFFFFF',
+		destination16: destination,
 		command: command.cmd,
 		commandParameter: command.value
 	};
 
-	console.log(frame_obj);
-
 	xbeeAPI.builder.write(frame_obj);
 }
-
-function processRemoteResponse(frame) {}
 
 // serial_xbee.on('data', function(data) {
 // 	console.log(data.type);

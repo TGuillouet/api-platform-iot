@@ -10,7 +10,7 @@ class Frame {
 			`DIGITAL: ${JSON.stringify(frame.digitalSamples)}`,
 			`ANALOG: ${JSON.stringify(frame.analogSamples)}`
 		);
-		this.mac_address = frame.remote64;
+		this.mac_address = frame.remote16;
 		this.digital_values = frame.digitalSamples;
 		this.analog_values = frame.analogSamples;
 	}
