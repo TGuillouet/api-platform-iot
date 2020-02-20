@@ -1,4 +1,6 @@
-const API_URL = '';
+const fetch = require('node-fetch');
+
+const API_URL = 'https://localhost:8443';
 
 /**
  * Perform a request to the API
@@ -6,7 +8,10 @@ const API_URL = '';
  * @param {Object} body The request body (used in POST, PUT and PATCH)
  * @param {Object} headers The request headers
  */
-const request = (path, method, body = {}, headers = { 'Content-Type': 'application/json' }) => {
+const request = (path, method, body = null, headers = { 'Content-Type': 'application/json' }) => {
+	if (path[0] !== '/') {
+		path = '/' + path;
+	}
 	return fetch(API_URL + path, {
 		method,
 		headers,

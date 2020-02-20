@@ -1,8 +1,4 @@
 class Frame {
-	mac_address = '0000000000000000';
-	digital_values = {};
-	analog_values = {};
-
 	constructor(frame) {
 		console.log(
 			'Reveiving a new frame with',

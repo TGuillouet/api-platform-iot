@@ -2,8 +2,8 @@ const io = require('socket.io')();
 var SerialPort = require('serialport');
 var xbee_api = require('xbee-api');
 const Frame = require('./helpers/Frame');
-const Table = require('./entities/Table');
 const TableState = require('./enums/TableState');
+const TableModel = require('./api/Table');
 var C = xbee_api.constants;
 
 // Constants
@@ -30,7 +30,10 @@ serialport.pipe(xbeeAPI.parser);
 xbeeAPI.builder.pipe(serialport);
 
 serialport.on('open', function() {
-	sendATFrame('3de2', { cmd: 'D1', value: [ 0x05 ] });
+	TableModel.getTables().then((val) => {
+		console.log(val);
+		sendATFrame('3de2', { cmd: 'D1', value: [ 0x05 ] });
+	});
 });
 
 // All frames parsed by the XBee will be emitted here
