@@ -1,3 +1,6 @@
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0
+
+
 const io = require('socket.io')();
 var SerialPort = require('serialport');
 var xbee_api = require('xbee-api');
