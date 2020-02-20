@@ -5,7 +5,12 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * @ApiResource()
@@ -17,23 +22,28 @@ class RTable
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"chairs"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"chairs"})
      */
     private $state;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"chairs"})
      */
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=16)
+     * @ORM\Column(type="string", length=255)
+     * @Assert\Length(max=16)
+     * @Groups({"chairs"})
      */
-    private $mac_address;
+    private $macAddress;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Chair", mappedBy="rtable")
@@ -76,12 +86,12 @@ class RTable
 
     public function getMacAddress(): ?string
     {
-        return $this->mac_address;
+        return $this->macAddress;
     }
 
-    public function setMacAddress(string $mac_address): self
+    public function setMacAddress(string $macAddress): self
     {
-        $this->mac_address = $mac_address;
+        $this->macAddress = $macAddress;
 
         return $this;
     }

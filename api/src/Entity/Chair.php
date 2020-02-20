@@ -3,10 +3,13 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ * normalizationContext={"groups"={"chairs"}}
+ * )
  * @ORM\Entity(repositoryClass="App\Repository\ChairRepository")
  */
 class Chair
@@ -15,18 +18,21 @@ class Chair
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"chairs"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\RTable", inversedBy="chairs")
+     * @Groups({"chairs"})
      */
     private $rtable;
 
     /**
      * @ORM\Column(type="string", length=16)
+     * @Groups({"chairs"})
      */
-    private $mac_address;
+    private $macAddress;
 
     public function getId(): ?int
     {
@@ -47,12 +53,12 @@ class Chair
 
     public function getMacAddress(): ?string
     {
-        return $this->mac_address;
+        return $this->macAddress;
     }
 
-    public function setMacAddress(string $mac_address): self
+    public function setMacAddress(string $macAddress): self
     {
-        $this->mac_address = $mac_address;
+        $this->macAddress = $macAddress;
 
         return $this;
     }
