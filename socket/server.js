@@ -41,7 +41,7 @@ let previousTables = [];
 let currentTables = [];
 serialport.on('open', function() {
 	getStatus = setInterval(async () => {
-		const res = await request('/r_tables', 'GET');
+		const res = await TableModel.getTables();
 		previousTables = currentTables;
 		currentTables = res.rows;
 
@@ -49,15 +49,19 @@ serialport.on('open', function() {
 			let current = currentTables.find((cTable) => cTable.id === pTable.id);
 			if (current.state !== pTable.state) {
 				if (current.state === TableState.PROCESSING) {
-					console.log('Processing a table', current.macAddress);
+					console.log('Processing a table', current.mac_address);
 					sendATFrame(current.macAddress, { cmd: 'D1', value: [ 0x05 ] });
 				} else if (current.state === TableState.PROCESSED) {
-					console.log('Table processed', current.macAddress);
+					console.log('Table processed', current.mac_address);
 					sendATFrame(current.macAddress, { cmd: 'D1', value: [ 0x04 ] });
 				}
 			}
 		});
 	}, 5000);
+});
+
+serialport.on('close', function() {
+	clearInterval(getStatus);
 });
 
 // All frames parsed by the XBee will be emitted here
@@ -129,8 +133,8 @@ async function processIOFrame(frame) {
 
 			const chair = chairResponse.rows.find((cChair) => cChair.mac_address === currentFrame.mac_address);
 
-			// If a chair is found
-			if (chair) {
+			// If a chair is found and if the table is not taken
+			if (chair && chair.table.state === TableState.NOT_TAKEN) {
 				// Update the table with it's new state
 				await TableModel.updateTable(chair.table.id, { state: TableState.TAKEN });
 			}
