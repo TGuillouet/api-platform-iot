@@ -87,7 +87,6 @@ xbeeAPI.parser.on('data', function(frame) {
 		// let dataReceived = String.fromCharCode.apply(null, frame.nodeIdentifier);
 		// console.log(">> ZIGBEE_RECEIVE_PACKET >", frame);
 	} else if (C.FRAME_TYPE.ZIGBEE_IO_DATA_SAMPLE_RX === frame.type) {
-		// console.log(frame);
 		processIOFrame(frame);
 	} else if (C.FRAME_TYPE.REMOTE_COMMAND_RESPONSE === frame.type) {
 		// console.log('RemoteResponse', frame);
@@ -148,24 +147,3 @@ function processRemoteResponse(frame) {
 	const currentFrame = new Frame(frame);
 	console.log(currentFrame);
 }
-
-// serial_xbee.on('data', function(data) {
-// 	console.log(data.type);
-// 	console.log('xbee data received:', data.type);
-// 	// client.emit('timer', "pouet");
-// });
-
-// shepherd.on('ready', function () {
-//   console.log('Server is ready.');
-//
-//   // allow devices to join the network within 60 secs
-//   shepherd.permitJoin(60, function (err) {
-//     if (err)
-//       console.log(err);
-//   });
-// });
-
-// shepherd.start(function (err) {                // start the server
-//   if (err)
-//     console.log(err);
-// });
