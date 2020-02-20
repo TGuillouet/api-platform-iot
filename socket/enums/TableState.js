@@ -5,7 +5,8 @@ const TableState = {
 	NOT_TAKEN: 'not_taken',
 	TAKEN: 'taken',
 	PROCESSING: 'process',
-	PROCESSED: 'processed'
+	PROCESSED: 'processed',
+	PAID: 'paid'
 };
 
 module.exports = TableState;

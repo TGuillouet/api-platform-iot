@@ -4,7 +4,7 @@ const io = require('socket.io')();
 const SerialPort = require('serialport');
 const xbee_api = require('xbee-api');
 
-const request = require('./helpers/request');
+const sendATFrame = require('./helpers/sendATFrame');
 const Frame = require('./helpers/Frame');
 const TableState = require('./enums/TableState');
 
@@ -49,11 +49,11 @@ serialport.on('open', function() {
 			let current = currentTables.find((cTable) => cTable.id === pTable.id);
 			if (current.state !== pTable.state) {
 				if (current.state === TableState.PROCESSING) {
-					console.log('Processing a table', current.mac_address);
 					sendATFrame(current.macAddress, { cmd: 'D1', value: [ 0x05 ] });
 				} else if (current.state === TableState.PROCESSED) {
-					console.log('Table processed', current.mac_address);
 					sendATFrame(current.macAddress, { cmd: 'D1', value: [ 0x04 ] });
+				} else if (current.state === TableState.PAID) {
+					TableState.updateTable(current.id, { state: TableState.NOT_TAKEN });
 				}
 			}
 		});
@@ -147,18 +147,6 @@ async function processIOFrame(frame) {
 function processRemoteResponse(frame) {
 	const currentFrame = new Frame(frame);
 	console.log(currentFrame);
-}
-
-function sendATFrame(destination, command) {
-	const frame_obj = {
-		// AT Request to be sent
-		type: C.FRAME_TYPE.REMOTE_AT_COMMAND_REQUEST,
-		destination16: destination,
-		command: command.cmd,
-		commandParameter: command.value
-	};
-
-	xbeeAPI.builder.write(frame_obj);
 }
 
 // serial_xbee.on('data', function(data) {
