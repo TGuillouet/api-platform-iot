@@ -1,4 +1,5 @@
 const Entity = require('./Entity');
+const Table = require('./Table');
 
 /**
  * @class The entity who is representing a table in the database
@@ -15,7 +16,7 @@ class Chair extends Entity {
      */
 	constructor(id, table, mac_address) {
 		super(id);
-		this.table = table;
+		this.table = new Table(table.id, table.name, table.state, table.macAddress);
 		this.mac_address = mac_address;
 	}
 }
