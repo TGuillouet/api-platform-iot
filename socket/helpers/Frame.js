@@ -1,4 +1,13 @@
+/**
+ * @class The representation of a frame
+ */
 class Frame {
+	/**
+	 * Create an instance of a Frame
+	 * 
+	 * @constructor
+	 * @param {any} frame A frame sent by a xbee
+	 */
 	constructor(frame) {
 		console.log(
 			'Reveiving a new frame with',

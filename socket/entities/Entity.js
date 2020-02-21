@@ -2,6 +2,7 @@ const ImmutableProperty = require('./../errors/ImmutableProperty');
 
 /**
  * @class The superclass who represent a basic entity (with his primary key only)
+ * @exports
  */
 class Entity {
 	/**
