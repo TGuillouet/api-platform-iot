@@ -94,6 +94,43 @@ export function update(item, values) {
   };
 }
 
+export function patch(item, values) {
+  return dispatch => {
+    dispatch(updateError(null));
+    dispatch(createSuccess(null));
+    dispatch(updateLoading(true));
+
+    return fetch(item['@id'], {
+      method: 'PATCH',
+      headers: new Headers({ 'Content-Type': 'application/merge-patch+json' }),
+      body: JSON.stringify(values)
+    })
+      .then(response =>
+        response
+          .json()
+          .then(retrieved => ({ retrieved, hubURL: extractHubURL(response) }))
+      )
+      .then(({ retrieved, hubURL }) => {
+        retrieved = normalize(retrieved);
+
+        dispatch(updateLoading(false));
+        dispatch(updateSuccess(retrieved));
+
+        if (hubURL) dispatch(mercureSubscribe(hubURL, retrieved['@id']));
+      })
+      .catch(e => {
+        dispatch(updateLoading(false));
+
+        if (e instanceof SubmissionError) {
+          dispatch(updateError(e.errors._error));
+          throw e;
+        }
+
+        dispatch(updateError(e.message));
+      });
+  };
+}
+
 export function reset(eventSource) {
   return dispatch => {
     if (eventSource) eventSource.close();

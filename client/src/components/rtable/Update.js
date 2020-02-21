@@ -94,6 +94,7 @@ class Update extends Component {
         <button onClick={this.del} className="btn btn-danger">
           Delete
         </button>
+        <span>dsfsjf</span>
       </div>
     );
   }

@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { list, reset } from '../../actions/rtable/list';
+import { patch } from '../../actions/rtable/update';
 
 class List extends Component {
   static propTypes = {
@@ -65,7 +66,7 @@ class List extends Component {
               <th>name</th>
               <th>macAddress</th>
               <th>chairs</th>
-              <th colSpan={2} />
+              <th colSpan={4} />
             </tr>
           </thead>
           <tbody>
@@ -93,11 +94,28 @@ class List extends Component {
                       <span className="sr-only">Edit</span>
                     </Link>
                   </td>
+                  <td>
+                    <select onChange={(val) => {
+                      this.setState({ newState: val });
+                    }}>
+                      <option>process</option>
+                      <option>processed</option>
+                      <option>paid</option>
+                    </select>
+                  </td>
+                  <td>
+                    <button onClick={() => this.props.patch(item, this.state.newState)}>
+                      <span className="fa fa-check-circle-o" aria-hidden="true" />
+                    </button>
+                    <Link to={`edit/${encodeURIComponent(item['@id'])}`}>
+                    <span className="fa fa-check-circle-o" aria-hidden="true" />
+                    <span className="sr-only">Apply</span>
+                    </Link>
+                    </td>
                 </tr>
               ))}
           </tbody>
         </table>
-
         {this.pagination()}
       </div>
     );
@@ -172,6 +190,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => ({
   list: page => dispatch(list(page)),
+  patch: (item, values) => dispatch(patch(item, values)),
   reset: eventSource => dispatch(reset(eventSource))
 });
 
