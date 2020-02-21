@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 import { reducer as form } from 'redux-form';
 import { Route, Switch } from 'react-router-dom';
-import createBrowserHistory from 'history/createBrowserHistory';
+import { createBrowserHistory } from "history";
 import {
   ConnectedRouter,
   connectRouter,
@@ -14,15 +14,15 @@ import {
 import 'bootstrap/dist/css/bootstrap.css';
 import 'font-awesome/css/font-awesome.css';
 import * as serviceWorker from './serviceWorker';
-// Import your reducers and routes here
-import Welcome from './Welcome';
+import rtable from './reducers/rtable';
+import RtableRoutes from './routes/rtable';
 
 const history = createBrowserHistory();
 const store = createStore(
   combineReducers({
     router: connectRouter(history),
     form,
-    /* Add your reducers here */
+    rtable
   }),
   applyMiddleware(routerMiddleware(history), thunk)
 );
@@ -31,8 +31,7 @@ ReactDOM.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
       <Switch>
-        <Route path="/" component={Welcome} strict={true} exact={true}/>
-        {/* Add your routes here */}
+        {RtableRoutes}
         <Route render={() => <h1>Not Found</h1>} />
       </Switch>
     </ConnectedRouter>
