@@ -8,7 +8,7 @@ const Table = require('./../entities/Table');
 async function getTables() {
 	return await request('/r_tables', 'GET').then((value) => ({
 		...value,
-		rows: value.rows.map((v) => new Table(v.id, v.rtable, v.macAddress))
+		rows: value.rows.map((v) => new Table(v.id, v.name, v.state, v.macAddress))
 	}));
 }
 
