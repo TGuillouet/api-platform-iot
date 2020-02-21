@@ -44,18 +44,16 @@ serialport.on('open', function() {
 		const res = await TableModel.getTables();
 		previousTables = currentTables;
 		currentTables = res.rows;
-		console.log(currentTables);
 
 		previousTables.forEach((pTable) => {
 			let current = currentTables.find((cTable) => cTable.id === pTable.id);
 			if (current.state !== pTable.state) {
 				if (current.state === TableState.PROCESSING) {
-					console.log('Processing table:', current);
 					sendATFrame(current.macAddress, { cmd: 'D1', value: [ 0x05 ] }, xbeeAPI);
 				} else if (current.state === TableState.PROCESSED) {
 					sendATFrame(current.macAddress, { cmd: 'D1', value: [ 0x04 ] }, xbeeAPI);
 				} else if (current.state === TableState.PAID) {
-					TableState.updateTable(current.id, { state: TableState.NOT_TAKEN });
+					TableModel.updateTable(current.id, { state: TableState.NOT_TAKEN });
 				}
 			}
 		});
