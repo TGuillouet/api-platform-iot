@@ -39,8 +39,8 @@ class RTable
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Assert\Length(max=16)
+     * @ORM\Column(type="string", length=4)
+     * @Assert\Length(max=4)
      * @Groups({"chairs"})
      */
     private $macAddress;
