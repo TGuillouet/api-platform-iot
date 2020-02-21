@@ -28,6 +28,7 @@ class RTable
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Choice(callback="getStates")
      * @Groups({"chairs"})
      */
     private $state;
@@ -125,5 +126,15 @@ class RTable
         }
 
         return $this;
+    }
+
+    public static function getStates() {
+        return [
+            "not_taken",
+            "taken",
+            "process",
+            "processed",
+            "paid"
+        ];
     }
 }
