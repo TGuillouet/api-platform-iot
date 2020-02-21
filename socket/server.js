@@ -124,7 +124,6 @@ console.log('listening on port ', port);
 
 async function processIOFrame(frame) {
 	const currentFrame = new Frame(frame);
-	console.log(frame);
 	// FIXME: Analog value
 	if (currentFrame.digital_values.DIO0 === 1) {
 		try {
@@ -133,7 +132,6 @@ async function processIOFrame(frame) {
 
 			const chair = chairResponse.rows.find((cChair) => cChair.mac_address === currentFrame.mac_address);
 
-			console.log(chair);
 			// If a chair is found and if the table is not taken
 			if (chair && chair.table.state === TableState.NOT_TAKEN) {
 				// Update the table with it's new state
